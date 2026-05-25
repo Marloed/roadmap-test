@@ -1,5 +1,6 @@
-from blacksheep import Request, get, post
+from blacksheep import Request, get, post, json
 import random
+from app.tables import User
 counter = {
     "total": 0,
     "random": 0,
@@ -33,3 +34,18 @@ async def post_echo(request: Request):
 @get("/counter")
 def get_counter():
     return counter
+
+@get("/health")
+async def health_check():
+    try:
+        await User.count().run()
+    except Exception:
+        return json(
+            {"status": "database error"},
+            status=503,
+        )
+    
+    return json(
+        {"status": "ok"},
+        status=200,
+    )
