@@ -1,5 +1,4 @@
 from blacksheep import Request,  get, post, put, delete, json
-from datetime import date
 from app.responses import error_response, status_response
 from app.users_service import (
     find_user_by_email,
@@ -14,10 +13,10 @@ from app.users_service import (
     )
 from app.users_utils import get_adult_border_date
 from asyncpg.exceptions import UniqueViolationError
-from app.users_validation import (
-    validate_required_user_fields,
-    parse_birth_date
-    )
+from pydantic import ValidationError
+from app.users_schemas import CreateUserInput
+
+
 @get("/users")
 async def get_users():
     users = await get_all_users()
@@ -55,25 +54,23 @@ async def get_users_minors():
 @post("/users")
 async def create_user(request: Request):
     data = await request.json()
-    error = validate_required_user_fields(data)
-    if error is not None:
-        return error_response(error["error"], 400)
-
-    birth_date, error = parse_birth_date(data["birth_date"])
-    if error is not None:
-        return error_response(error["error"], 400)
+    
+    try:
+        input_data = CreateUserInput(**data)
+    except ValidationError:
+        return error_response("invalid input data", 400)
     
     try:
         await create_user_in_db(
-            email=data["email"],
-            username=data["username"],
-            birth_date=birth_date,
-            phone=data.get("phone", "")
+            email=input_data.email,
+            username=input_data.username,
+            birth_date=input_data.birth_date,
+            phone=input_data.phone,
         )
     except UniqueViolationError:
-        return error_response("email alredy exists", 409)
+        return error_response("email already exists", 409)
     
-    return status_response("create", 201)
+    return status_response("created", 201)
 
 @put("/users/by-email/{email}/phone")
 async def update_user_phone(email: str, request: Request):
