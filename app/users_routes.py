@@ -12,6 +12,7 @@ from app.users_service import (
     get_adult_users_from_db,
     get_minor_users_from_db
     )
+from app.users_utils import get_adult_border_date
 from asyncpg.exceptions import UniqueViolationError
 from app.users_validation import (
     validate_required_user_fields,
@@ -43,12 +44,12 @@ async def get_users_with_phone():
 
 @get("/users/adults")
 async def get_users_adults():
-    users = await get_adult_users_from_db(date(2008, 5, 18))
+    users = await get_adult_users_from_db(get_adult_border_date())
     return users
 
 @get("/users/minors")
 async def get_users_minors():
-    users = await get_minor_users_from_db(date(2008, 5, 18))
+    users = await get_minor_users_from_db(get_adult_border_date())
     return users
 
 @post("/users")
