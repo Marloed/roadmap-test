@@ -1,5 +1,10 @@
 from blacksheep import Request,  get, post, put, delete, json
-from app.responses import error_response, status_response
+from datetime import date
+from app.responses import (
+    error_response, 
+    status_response,
+    validation_error_response,
+    )
 from app.users_service import (
     find_user_by_email,
     create_user_in_db,
@@ -14,7 +19,10 @@ from app.users_service import (
 from app.users_utils import get_adult_border_date
 from asyncpg.exceptions import UniqueViolationError
 from pydantic import ValidationError
-from app.users_schemas import CreateUserInput
+from app.users_schemas import (
+    CreateUserInput,
+    UpdateUserPhoneInput
+)
 
 
 @get("/users")
@@ -57,8 +65,8 @@ async def create_user(request: Request):
     
     try:
         input_data = CreateUserInput(**data)
-    except ValidationError:
-        return error_response("invalid input data", 400)
+    except ValidationError as error:
+        return validation_error_response(error)
     
     try:
         await create_user_in_db(
@@ -76,8 +84,10 @@ async def create_user(request: Request):
 async def update_user_phone(email: str, request: Request):
     data = await request.json()
     
-    if "phone" not in data or data["phone"] == "":
-        return error_response("phone is required", 400)
+    try:
+        input_data = UpdateUserPhoneInput(**data)
+    except ValidationError as error:
+        return validation_error_response(error)
     
     user = await find_user_by_email(email)
     
@@ -86,7 +96,7 @@ async def update_user_phone(email: str, request: Request):
     
     await update_user_phone_in_db(
         email=email,
-        phone=data["phone"]
+        phone=input_data.phone
     )
     
     return status_response("updated")
