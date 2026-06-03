@@ -23,6 +23,7 @@ from app.users_schemas import (
     CreateUserInput,
     UpdateUserPhoneInput
 )
+from app.request_utils import read_json_body
 
 
 @get("/users")
@@ -61,7 +62,9 @@ async def get_users_minors():
 
 @post("/users")
 async def create_user(request: Request):
-    data = await request.json()
+    data, error = await read_json_body(request)
+    if error is not None:
+        return error_response(error, 400)
     
     try:
         input_data = CreateUserInput(**data)
@@ -82,7 +85,9 @@ async def create_user(request: Request):
 
 @put("/users/by-email/{email}/phone")
 async def update_user_phone(email: str, request: Request):
-    data = await request.json()
+    data, error = await read_json_body(request)
+    if error is not None:
+        return error_response(error, 400)
     
     try:
         input_data = UpdateUserPhoneInput(**data)

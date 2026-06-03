@@ -30,7 +30,7 @@ async def find_user_by_email(email):
     return serialize_user_detail(users[0])
 
 
-async def create_user_in_db(email, username, birth_date, phone):
+async def create_user_in_db(email, username, birth_date, phone: str):
     user = User(
         email=email,
         username=username,
@@ -55,7 +55,7 @@ async def delete_user_by_email_in_db(email):
     ).run()
 
 
-async def get_all_users():
+async def get_all_users() -> dict:
     users = await User.select(
         User.email,
         User.username,
