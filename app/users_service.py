@@ -19,7 +19,7 @@ def serialize_user_detail(user):
     ).model_dump()
 
 
-async def find_user_by_email(email):
+async def find_user_by_email_raw(email):
     users = await User.select().where(
         User.email == email
     ).run()
@@ -27,7 +27,15 @@ async def find_user_by_email(email):
     if len(users) == 0:
         return None
 
-    return serialize_user_detail(users[0])
+    return users[0]
+
+async def get_user_detail_by_email(email):
+    user = await find_user_by_email_raw(email)
+    
+    if user is None:
+        return None
+    
+    return serialize_user_detail(user)
 
 
 async def create_user_in_db(email, username, birth_date, phone: str):

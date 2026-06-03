@@ -6,7 +6,8 @@ from app.responses import (
     validation_error_response,
     )
 from app.users_service import (
-    find_user_by_email,
+    find_user_by_email_raw,
+    get_user_detail_by_email,
     create_user_in_db,
     update_user_phone_in_db,
     delete_user_by_email_in_db,
@@ -33,7 +34,7 @@ async def get_users():
 
 @get("/users/by-email/{email}")
 async def get_user_by_email(email: str):
-    user = await find_user_by_email(email)
+    user = await get_user_detail_by_email(email)
     
     if user is None:
         return error_response("user not found", 404)
@@ -94,7 +95,7 @@ async def update_user_phone(email: str, request: Request):
     except ValidationError as error:
         return validation_error_response(error)
     
-    user = await find_user_by_email(email)
+    user = await find_user_by_email_raw(email)
     
     if user is None:
         return error_response("user not found", 404)
@@ -108,7 +109,7 @@ async def update_user_phone(email: str, request: Request):
 
 @delete("/users/by-email/{email}")
 async def delete_user(email: str):
-    user = await find_user_by_email(email)
+    user = await find_user_by_email_raw(email)
     
     if user is None:
         return error_response("user not found", 404)
