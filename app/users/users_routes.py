@@ -5,7 +5,7 @@ from app.responses import (
     status_response,
     validation_error_response,
     )
-from app.users_service import (
+from app.users.users_service import (
     find_user_by_email_raw,
     get_user_detail_by_email,
     create_user_in_db,
@@ -17,10 +17,10 @@ from app.users_service import (
     get_adult_users_from_db,
     get_minor_users_from_db
     )
-from app.users_utils import get_adult_border_date
+from app.users.users_utils import get_adult_border_date
 from asyncpg.exceptions import UniqueViolationError
 from pydantic import ValidationError
-from app.users_schemas import (
+from app.users.users_schemas import (
     CreateUserInput,
     UpdateUserPhoneInput
 )

@@ -1,5 +1,5 @@
 from app.tables import User
-from app.users_schemas import UserPublicOutput, UserDetailOutput
+from app.users.users_schemas import UserPublicOutput, UserDetailOutput
 
 
 def serialize_user_public(user):
