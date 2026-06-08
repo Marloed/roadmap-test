@@ -1,4 +1,4 @@
-from blacksheep import Request, get, post, put
+from blacksheep import Request, get, post, put, delete
 from pydantic import ValidationError
 
 from app.devices.devices_schemas import (
@@ -11,6 +11,7 @@ from app.devices.devices_service import (
     create_device_in_db,
     find_device_by_id_raw,
     update_device_status_in_db,
+    delete_device_by_in_id_db,
 )
 
 from app.request_utils import read_json_body
@@ -76,3 +77,12 @@ async def update_device_status(device_id: str, request: Request):
     )
     
     return status_response("updated")
+
+@delete("/devices/{device_id}")
+async def delete_device(device_id: str):
+    device = await find_device_by_id_raw(device_id)
+    
+    if device is None:
+        return error_response("device not found", 404)
+    
+    await delete_device_by_in_id_db(device_id)

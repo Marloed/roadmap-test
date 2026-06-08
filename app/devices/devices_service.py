@@ -72,3 +72,8 @@ async def update_device_status_in_db(device_id, status):
     }).where(
         Device.id == device_id
     ).run()
+    
+async def delete_device_by_in_id_db(device_id):
+    await Device.delete().where(
+        Device.id == device_id
+    ).run()
