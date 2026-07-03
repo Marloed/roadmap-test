@@ -65,15 +65,3 @@ async def update_device_status_in_db(device_id, status):
         Device.id == device_id
     )
     
-async def update_device_in_db(device_id, name, ip_address, type, status):
-    device = await find_device_by_id_raw(device_id)
-    
-    if device is None:
-        return None
-    
-    await Device.update({
-        Device.name: name,
-        Device.ip_address: ip_address,
-        Device.type: type,
-        Device.status: status,
-    })
